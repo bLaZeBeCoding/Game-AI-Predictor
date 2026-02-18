@@ -1,3 +1,6 @@
+from xgboost import XGBClassifier
+
+
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
@@ -46,6 +49,21 @@ rf_model.fit(X_train, y_train)
 
 y_pred_rf = rf_model.predict(X_test)
 accuracy_rf = accuracy_score(y_test, y_pred_rf)
+
+print("Training XGBoost...")
+xgb_model = XGBClassifier(
+    n_estimators=300,
+    learning_rate=0.05,
+    max_depth=5,
+    random_state=42
+)
+
+xgb_model.fit(X_train, y_train)
+y_pred_xgb = xgb_model.predict(X_test)
+accuracy_xgb = accuracy_score(y_test, y_pred_xgb)
+
+print("XGBoost Accuracy:", accuracy_xgb)
+
 
 print("------------ RESULTS ------------")
 print("Logistic Regression Accuracy:", accuracy_log)
