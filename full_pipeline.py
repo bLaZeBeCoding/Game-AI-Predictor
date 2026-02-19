@@ -1,12 +1,11 @@
 # ==========================================
-# GAME AI PREDICTOR – FULL PIPELINE (FINAL)
+# GAME AI MATCH WIN PREDICTION PIPELINE
+# Runs in: Jupyter, Colab, CMD, IDLE, Jenkins
 # ==========================================
 
 import os
 import pandas as pd
 import numpy as np
-import matplotlib
-matplotlib.use("Agg")   # IMPORTANT for Jenkins (headless)
 import matplotlib.pyplot as plt
 import seaborn as sns
 
@@ -14,76 +13,78 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, confusion_matrix, ConfusionMatrixDisplay
+
 from xgboost import XGBClassifier
 
-# ==========================================
-# DEBUG PATHS (VERY IMPORTANT)
-# ==========================================
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-OUTPUT_DIR = os.path.join(BASE_DIR, "outputs")
-
-print("\n========== DEBUG INFO ==========")
+# ==============================
+# DEBUG INFO (For Jenkins marks)
+# ==============================
+print("========== DEBUG INFO ==========")
 print("Current working directory:", os.getcwd())
-print("Script location:", BASE_DIR)
-print("Output directory will be:", OUTPUT_DIR)
+print("Script location:", os.path.dirname(os.path.abspath(__file__)))
+
+OUTPUT_DIR = os.path.join(os.getcwd(), "outputs")
+os.makedirs(OUTPUT_DIR, exist_ok=True)
+print("Output directory:", OUTPUT_DIR)
 print("================================\n")
 
-os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-# ==========================================
+# ==============================
 # STEP 1 — LOAD DATASET
-# ==========================================
+# ==============================
 print("STEP 1: Loading dataset...")
 
-data_path = os.path.join(BASE_DIR, "data", "high_diamond_ranked_10min.csv")
-df = pd.read_csv(data_path)
+df = pd.read_csv("data/high_diamond_ranked_10min.csv")
+print("Dataset loaded successfully\n")
 
-print("Dataset loaded successfully")
 
-# ==========================================
-# STEP 2 — EDA (SAVE PLOTS)
-# ==========================================
+# ==============================
+# STEP 2 — EDA + SAVE PLOTS
+# ==============================
 print("STEP 2: Running EDA and saving plots...")
 
-plt.figure(figsize=(6,4))
+# Match outcome distribution
 sns.countplot(x="blueWins", data=df)
 plt.title("Match Outcome Distribution")
 plt.savefig(os.path.join(OUTPUT_DIR, "match_outcome.png"))
 plt.close()
 
+# Correlation heatmap
 plt.figure(figsize=(14,10))
 sns.heatmap(df.corr(), cmap="coolwarm")
-plt.title("Correlation Heatmap")
-plt.savefig(os.path.join(OUTPUT_DIR, "heatmap.png"))
+plt.title("Feature Correlation Heatmap")
+plt.savefig(os.path.join(OUTPUT_DIR, "correlation_heatmap.png"))
 plt.close()
 
-plt.figure(figsize=(6,4))
+# Gold difference vs win
 sns.boxplot(x="blueWins", y="blueGoldDiff", data=df)
 plt.title("Gold Difference vs Win")
 plt.savefig(os.path.join(OUTPUT_DIR, "gold_diff.png"))
 plt.close()
 
-plt.figure(figsize=(6,4))
+# Experience difference vs win
 sns.boxplot(x="blueWins", y="blueExperienceDiff", data=df)
 plt.title("Experience Difference vs Win")
-plt.savefig(os.path.join(OUTPUT_DIR, "xp_diff.png"))
+plt.savefig(os.path.join(OUTPUT_DIR, "exp_diff.png"))
 plt.close()
 
-plt.figure(figsize=(6,4))
-sns.boxplot(x="blueWins", y="blueKills", data=df)
-plt.title("Kills vs Win")
-plt.savefig(os.path.join(OUTPUT_DIR, "kills.png"))
+# Kill difference vs win
+df["killDiff"] = df["blueKills"] - df["redKills"]
+sns.boxplot(x="blueWins", y="killDiff", data=df)
+plt.title("Kill Difference vs Win")
+plt.savefig(os.path.join(OUTPUT_DIR, "kill_diff.png"))
 plt.close()
 
-print("Plots saved successfully!")
+print("EDA completed. Plots saved.\n")
 
-# ==========================================
+
+# ==============================
 # STEP 3 — PREPROCESSING
-# ==========================================
+# ==============================
 print("STEP 3: Preprocessing data...")
 
-X = df.drop("blueWins", axis=1)
+X = df.drop(["blueWins","gameId"], axis=1)
 y = df["blueWins"]
 
 X_train, X_test, y_train, y_test = train_test_split(
@@ -94,47 +95,87 @@ scaler = StandardScaler()
 X_train_scaled = scaler.fit_transform(X_train)
 X_test_scaled = scaler.transform(X_test)
 
-# ==========================================
+print("Preprocessing complete.\n")
+
+
+# ==============================
 # STEP 4 — TRAIN MODELS
-# ==========================================
+# ==============================
 print("STEP 4: Training models...")
 
 # Logistic Regression
 log_model = LogisticRegression(max_iter=1000)
 log_model.fit(X_train_scaled, y_train)
-pred_log = log_model.predict(X_test_scaled)
-acc_log = accuracy_score(y_test, pred_log)
+y_pred_log = log_model.predict(X_test_scaled)
+acc_log = accuracy_score(y_test, y_pred_log)
 
 # Random Forest
 rf_model = RandomForestClassifier()
 rf_model.fit(X_train, y_train)
-pred_rf = rf_model.predict(X_test)
-acc_rf = accuracy_score(y_test, pred_rf)
+y_pred_rf = rf_model.predict(X_test)
+acc_rf = accuracy_score(y_test, y_pred_rf)
 
 # XGBoost
-xgb_model = XGBClassifier(eval_metric="logloss")
+xgb_model = XGBClassifier(use_label_encoder=False, eval_metric='logloss')
 xgb_model.fit(X_train, y_train)
-pred_xgb = xgb_model.predict(X_test)
-acc_xgb = accuracy_score(y_test, pred_xgb)
+y_pred_xgb = xgb_model.predict(X_test)
+acc_xgb = accuracy_score(y_test, y_pred_xgb)
 
-# ==========================================
-# FINAL RESULTS
-# ==========================================
 print("\n========== FINAL RESULTS ==========")
 print("Logistic Regression Accuracy:", acc_log)
 print("Random Forest Accuracy:", acc_rf)
 print("XGBoost Accuracy:", acc_xgb)
-print("===================================")
 
-print("\nBest Model:")
-models = {
+
+# ==============================
+# STEP 5 — CONFUSION MATRIX
+# ==============================
+print("\nSTEP 5: Generating evaluation plots...")
+
+cm = confusion_matrix(y_test, y_pred_log)
+disp = ConfusionMatrixDisplay(confusion_matrix=cm)
+disp.plot()
+plt.title("Confusion Matrix - Logistic Regression")
+plt.savefig(os.path.join(OUTPUT_DIR, "confusion_matrix.png"))
+plt.close()
+
+print("Confusion matrix saved!")
+
+
+# ==============================
+# STEP 6 — FEATURE IMPORTANCE
+# ==============================
+feature_importance = rf_model.feature_importances_
+features = X.columns
+
+importance_df = pd.DataFrame({
+    "Feature": features,
+    "Importance": feature_importance
+}).sort_values(by="Importance", ascending=False).head(10)
+
+plt.figure(figsize=(10,6))
+plt.barh(importance_df["Feature"], importance_df["Importance"])
+plt.gca().invert_yaxis()
+plt.title("Top 10 Important Features")
+plt.savefig(os.path.join(OUTPUT_DIR, "feature_importance.png"))
+plt.close()
+
+print("Feature importance saved!")
+
+
+# ==============================
+# STEP 7 — BEST MODEL SUMMARY
+# ==============================
+accuracies = {
     "Logistic Regression": acc_log,
     "Random Forest": acc_rf,
     "XGBoost": acc_xgb
 }
 
-best_model = max(models, key=models.get)
-print(best_model, "performed best with accuracy:", models[best_model])
+best_model = max(accuracies, key=accuracies.get)
 
+print("\nBest Model:", best_model)
+print("Accuracy:", accuracies[best_model])
 
-print("\nPipeline executed successfully.")
+print("\nAll plots saved inside /outputs folder")
+print("Pipeline executed successfully.")
