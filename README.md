@@ -11,7 +11,7 @@ Tech Stack
 Python, Pandas, NumPy
 Scikit-learn
 Matplotlib, Seaborn
-Jupyter Notebook
+Google Colab
 GitHub
 
 Workflow
