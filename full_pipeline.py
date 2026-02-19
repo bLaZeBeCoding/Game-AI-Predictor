@@ -126,4 +126,15 @@ print("Random Forest Accuracy:", acc_rf)
 print("XGBoost Accuracy:", acc_xgb)
 print("===================================")
 
+print("\nBest Model:")
+models = {
+    "Logistic Regression": acc_log,
+    "Random Forest": acc_rf,
+    "XGBoost": acc_xgb
+}
+
+best_model = max(models, key=models.get)
+print(best_model, "performed best with accuracy:", models[best_model])
+
+
 print("\nPipeline executed successfully.")
