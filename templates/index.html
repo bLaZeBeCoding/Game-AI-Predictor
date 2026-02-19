@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Game AI Predictor</title>
+</head>
+
+<body>
+    <h2>Game Outcome Predictor</h2>
+
+    <form action="/predict" method="post">
+        <input name="goldDiff" placeholder="Gold Difference"><br>
+        <input name="xpDiff" placeholder="XP Difference"><br>
+        <input name="kills" placeholder="Kills"><br>
+        <input name="dragons" placeholder="Dragons"><br>
+        <input name="towers" placeholder="Towers"><br>
+        <button type="submit">Predict</button>
+    </form>
+
+    <h3>{{ prediction_text }}</h3>
+</body>
+
+</html>

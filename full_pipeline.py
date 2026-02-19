@@ -179,3 +179,10 @@ print("Accuracy:", accuracies[best_model])
 
 print("\nAll plots saved inside /outputs folder")
 print("Pipeline executed successfully.")
+
+import joblib
+
+# Save best model (Logistic Regression)
+joblib.dump(log_model, "model.pkl")
+print("Model saved as model.pkl")
+
