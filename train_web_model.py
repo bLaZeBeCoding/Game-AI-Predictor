@@ -35,7 +35,7 @@ model = LogisticRegression()
 model.fit(X_train_scaled, y_train)
 
 # Save BOTH scaler + model
-joblib.dump(model, "model.pkl")
-joblib.dump(scaler, "scaler.pkl")
+joblib.dump(model, "web_model.pkl")
+joblib.dump(scaler, "web_scaler.pkl")
 
 print("Web model saved successfully!")
