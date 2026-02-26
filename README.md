@@ -1,39 +1,115 @@
-Title
+# Game AI Predictor
 
-Game AI Predictor
+## Overview
 
-Objective
+Game AI Predictor is a machine learning project that predicts the probability of winning a League of Legends match using early-game statistics.
 
-This project predicts the probability of winning a League of Legends match using early-game statistics and machine learning.
+The project trains machine learning models and generates predictions using a complete machine learning pipeline.
 
-Tech Stack
+----------
 
-Python, Pandas, NumPy
-Scikit-learn
-Matplotlib, Seaborn
-Google Colab
-GitHub
+## Requirements
 
-Workflow
+Make sure the following are installed:
 
-Exploratory Data Analysis
+-   Python 3.8 or higher
+    
+-   Git
+    
+-   Jenkins (optional)
+    
 
-Feature Engineering
+### Verify Installation
 
-Model Training
+Run the following commands in Command Prompt:
 
-Model Evaluation
+```
+python --version
+git --version
 
-Models Used
+```
 
-Logistic Regression
-Random Forest Classifier
+----------
 
-Results
+## How to Clone the Repository (Using Command Prompt)
 
-Logistic Regression Accuracy: ~73%
-Random Forest Accuracy: ~72%
+Open Command Prompt and run:
 
-Conclusion
+```
+git clone https://github.com/bLaZeBeCoding/Game-AI-Predictor.git
 
-Early game gold, experience and kill advantage strongly influence match outcome.
+```
+
+Then go into the project folder:
+
+```
+cd Game-AI-Predictor
+
+```
+
+This command downloads the complete project to your system.
+
+----------
+
+## Install Required Libraries
+
+Run:
+
+```
+pip install -r requirements.txt
+
+```
+
+----------
+
+## Run the Project
+
+Run the machine learning pipeline:
+
+```
+python full_pipeline.py
+
+```
+
+----------
+
+## Output
+
+After running the project:
+
+-   Machine learning models will be trained
+    
+-   Accuracy results will be displayed
+    
+-   Graphs will be generated
+    
+-   Output files will be saved in the **outputs** folder
+    
+
+----------
+
+## Jenkins Configuration
+
+Jenkins configuration screenshots are provided in the folder:
+
+**Jenkins_build_steps**
+
+Follow the images in this folder to configure Jenkins for running the project.
+
+----------
+
+## Jenkins Build Command
+
+```
+pip install -r requirements.txt
+python full_pipeline.py
+
+```
+
+----------
+
+## Author
+
+Uday Praveen
+
+----------
