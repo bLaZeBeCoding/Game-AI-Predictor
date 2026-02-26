@@ -20,8 +20,11 @@ def build_feature_vector(gold, xp, kills, dragons, towers):
 def home():
     return render_template("index.html")
 
+from flask import jsonify
+
 @app.route("/predict", methods=["POST"])
 def predict():
+
     gold = float(request.form["gold"])
     xp = float(request.form["xp"])
     kills = float(request.form["kills"])
@@ -36,11 +39,6 @@ def predict():
 
     result = "BLUE TEAM WINS" if prediction == 1 else "RED TEAM WINS"
 
-    from flask import jsonify
-
-@app.route("/predict", methods=["POST"])
-def predict():
-    ...
     return jsonify({
         "result": result,
         "prob": round(probability * 100, 2),
