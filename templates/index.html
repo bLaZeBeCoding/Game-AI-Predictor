@@ -16,6 +16,14 @@
             min-height: 100vh;
         }
 
+        .lol-logo {
+            display: block;
+            margin: auto;
+            width: 340px;
+            margin-bottom: 10px;
+            filter: drop-shadow(0px 0px 15px gold);
+        }
+
         /* ===== BACKGROUND SYSTEM ===== */
 
         .bg-layer {
@@ -163,6 +171,7 @@
     <div class="overlay"></div>
 
     <div class="container">
+        <img src="{{ url_for('static', filename='lol.png') }}" class="lol-logo">
         <h1>🎮 Game Outcome Predictor</h1>
 
         <form id="predictionForm">
@@ -190,10 +199,15 @@
     </div>
 
     <script>
+
         const form = document.getElementById("predictionForm");
 
+        /* =========================
+           Prediction Form Logic
+           ========================= */
+
         form.addEventListener("submit", function (e) {
-            e.preventDefault(); // 🚨 stops redirect
+            e.preventDefault();
 
             const formData = new FormData(form);
 
@@ -227,12 +241,68 @@
                             : "result red-win";
 
                     stats.innerHTML = `
-            Confidence: ${data.prob}%<br>
-            Model Used: ${data.model_name}<br>
-            Model Accuracy: ${data.accuracy}%
+        Confidence: ${data.prob}%<br>
+        Model Used: ${data.model_name}<br>
+        Model Accuracy: ${data.accuracy}%
         `;
                 });
+
         });
+
+
+        /* =========================
+           Background Image System
+           ========================= */
+
+        const images = [
+            "{{ url_for('static', filename='league.jpg') }}",
+            "{{ url_for('static', filename='league2.jpg') }}",
+            "{{ url_for('static', filename='league3.jpg') }}",
+            "{{ url_for('static', filename='league4.jpeg') }}"
+        ];
+
+        const bg1 = document.getElementById("bg1");
+        const bg2 = document.getElementById("bg2");
+
+        let currentIndex = 0;
+        let currentLayer = bg1;
+        let nextLayer = bg2;
+
+        function changeBackground() {
+
+            nextLayer.style.backgroundImage =
+                `url('${images[currentIndex]}')`;
+
+            nextLayer.classList.add("active");
+            nextLayer.classList.add("zoom");
+
+            currentLayer.classList.remove("active");
+            currentLayer.classList.remove("zoom");
+
+            let temp = currentLayer;
+            currentLayer = nextLayer;
+            nextLayer = temp;
+
+            currentIndex =
+                (currentIndex + 1) % images.length;
+        }
+
+
+        /* Initial Background */
+
+        bg1.style.backgroundImage =
+            `url('${images[0]}')`;
+
+        bg1.classList.add("active");
+        bg1.classList.add("zoom");
+
+        currentIndex = 1;
+
+
+        /* Change Every 7 Seconds */
+
+        setInterval(changeBackground, 7000);
+
     </script>
 
 </body>
